@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عارض الروابط - شاشة كاملة</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #1d1f24;
+      border-bottom: 1px solid #2e323b;
+      height: 50px;
+      align-items: center;
+    }
+
+    .toolbar input {
+      flex: 1;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid #3a3f4b;
+      background: #121317;
+      color: #fff;
+      font-size: 14px;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .toolbar button {
+      height: 34px;
+      padding: 0 14px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .toolbar button:hover {
+      background: #1d4ed8;
+    }
+
+    .toolbar button.secondary {
+      background: #374151;
+    }
+
+    .toolbar button.secondary:hover {
+      background: #4b5563;
+    }
+
+    .viewer-container {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 50px);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    /* عند تفعيل وضع ملء الشاشة تصبح الحاوية بارتفاع الشاشة بالكامل */
+    .viewer-container:fullscreen {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar" id="toolbar">
+    <input
+      type="url"
+      id="urlInput"
+      placeholder="https://nl.pornhub.com/video/search?search=dwarf+girl"
+      required
+    />
+    <button type="button" id="loadBtn">عرض</button>
+    <button type="button" class="secondary" id="fullscreenBtn">ملء الشاشة</button>
+    <button type="button" class="secondary" id="openTabBtn">فتح بنافذة</button>
+  </div>
+
+  <div class="viewer-container" id="viewerContainer">
+    <iframe
+      id="frame"
+      src="about:blank"
+      allow="fullscreen; autoplay; encrypted-media; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <script>
+    const urlInput = document.getElementById("urlInput");
+    const loadBtn = document.getElementById("loadBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const openTabBtn = document.getElementById("openTabBtn");
+    const frame = document.getElementById("frame");
+    const viewerContainer = document.getElementById("viewerContainer");
+
+    function normalizeUrl(raw) {
+      const trimmed = raw.trim();
+      if (!trimmed) return "";
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return "https://" + trimmed;
+    }
+
+    function loadUrl() {
+      const url = normalizeUrl(urlInput.value);
+      if (!url) return;
+      urlInput.value = url;
+      frame.src = url;
+    }
+
+    loadBtn.addEventListener("click", loadUrl);
+
+    urlInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        loadUrl();
+      }
+    });
+
+    fullscreenBtn.addEventListener("click", async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await viewerContainer.requestFullscreen();
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (err) {
+        console.error("تعذر تبديل وضع ملء الشاشة:", err);
+      }
+    });
+
+    openTabBtn.addEventListener("click", () => {
+      const url = normalizeUrl(urlInput.value);
+      if (!url) return;
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+  </script>
+</body>
+</html>
